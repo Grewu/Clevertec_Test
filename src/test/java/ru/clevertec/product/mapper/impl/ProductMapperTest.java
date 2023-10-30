@@ -37,12 +37,6 @@ class ProductMapperTest {
     @ParameterizedTest
     @CsvSource(value = {"Product", "Description,1.58"})
     void toInfoProductDtoShouldReturnInfoProductDTO(String name, String description, BigDecimal bigDecimal) {
-        ProductDto productDto = TestDataProduct.builder().
-                withName(name)
-                .withCreated(null)
-                .withDescription(description)
-                .withPrice(bigDecimal)
-                .build().buildProductDTO();
         Product expected = TestDataProduct.builder()
                 .withName(name)
                 .withCreated(null)
@@ -72,13 +66,6 @@ class ProductMapperTest {
     @ParameterizedTest
     @CsvSource(value = {"Product1,Desc1,2.0", "Product2,Desc2,3.5", "Product3,Desc3,5.0"})
     void toInfoProductDtoShouldReturnInfoProductDTOWithDifferentValues(String name, String description, BigDecimal bigDecimal) {
-        ProductDto productDto = TestDataProduct.builder()
-                .withName(name)
-                .withCreated(null)
-                .withDescription(description)
-                .withPrice(bigDecimal)
-                .build()
-                .buildProductDTO();
         Product expected = TestDataProduct.builder()
                 .withName(name)
                 .withCreated(null)
