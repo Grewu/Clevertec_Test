@@ -118,8 +118,7 @@ class ProductServiceImplTest {
     @Test
     void updateShouldWithUUID() {
         ProductDto expected = TestDataProduct.builder().build().buildProductDTO();
-        productService.update(UUID.fromString("aa77f040-308f-4ee0-acf1-d86c310bb52f")
-                              ,expected);
+        productService.update(UUID.fromString("aa77f040-308f-4ee0-acf1-d86c310bb52f"),expected);
     }
 
     @Test

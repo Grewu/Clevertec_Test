@@ -8,8 +8,6 @@ public record ProductDto(
          * {@link ru.clevertec.product.entity.Product}
          */
         String name,
-
-
         /**
          * {@link ru.clevertec.product.entity.Product}
          */
