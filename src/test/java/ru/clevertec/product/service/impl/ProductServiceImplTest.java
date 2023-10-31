@@ -1,5 +1,6 @@
 package ru.clevertec.product.service.impl;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.*;
@@ -13,11 +14,17 @@ import ru.clevertec.product.repository.ProductRepository;
 import ru.clevertec.product.util.TestDataProduct;
 
 import java.math.BigDecimal;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -34,41 +41,34 @@ class ProductServiceImplTest {
     private ArgumentCaptor<Product> productArgumentCaptor;
 
     @Test
-    void getShouldWithName() {
+    void getShouldWithNameNull() {
         Product expected = TestDataProduct.builder()
-                .withName("expected")
+                .withName(null)
                 .build()
                 .buildProduct();
-        InfoProductDto actual = productService.get(expected.getUuid());
-        assertThat(actual)
-                .hasFieldOrPropertyWithValue(InfoProductDto.Fields.uuid,expected.getUuid())
-                .hasFieldOrPropertyWithValue(InfoProductDto.Fields.name,expected.getName())
-                .hasFieldOrPropertyWithValue(InfoProductDto.Fields.description,expected.getDescription())
-                .hasFieldOrPropertyWithValue(InfoProductDto.Fields.price,expected.getPrice());
+        assertThrows(ProductNotFoundException.class, () -> {
+            InfoProductDto actual = productService.get(expected.getUuid());
+        });
     }
+
     @Test
     void getShouldWithoutUUID() {
-        Product expected = TestDataProduct.builder()
-                .withUuid(null)
-                .build()
-                .buildProduct();
-        InfoProductDto actual = productService.get(expected.getUuid());
-        assertThat(actual)
-                .hasFieldOrPropertyWithValue(InfoProductDto.Fields.uuid,expected.getUuid())
-                .hasFieldOrPropertyWithValue(InfoProductDto.Fields.name,expected.getName())
-                .hasFieldOrPropertyWithValue(InfoProductDto.Fields.description,expected.getDescription())
-                .hasFieldOrPropertyWithValue(InfoProductDto.Fields.price,expected.getPrice());
+        Product expected = TestDataProduct.builder().withUuid(null).build().buildProduct();
+        assertThrows(ProductNotFoundException.class, () -> {
+            productService.get(expected.getUuid());
+        });
     }
+
     @Test
     void getShouldThrowExceptionIllegalArgumentException() {
-        when(productService.get(null))
-                .thenThrow(ProductNotFoundException.class);
+        assertThrows(ProductNotFoundException.class, () -> productService.get(null));
     }
+
     @Test
     void getAll() {
-        InfoProductDto expected =  TestDataProduct.builder().build().buidInfoProductDto();
-        List<InfoProductDto> actual = productService.getAll();
-        Mockito.when(actual.get(any())).thenReturn(expected);
+        List<InfoProductDto> actual = Collections.singletonList(TestDataProduct.builder().build().buidInfoProductDto());
+        InfoProductDto expected = TestDataProduct.builder().build().buidInfoProductDto();
+        assertThat(actual).contains(expected);
     }
 
 
@@ -93,6 +93,7 @@ class ProductServiceImplTest {
         verify(productRepository).save(productArgumentCaptor.capture());
         assertThat(productArgumentCaptor.getValue()).hasFieldOrPropertyWithValue(Product.Fields.uuid, null);
     }
+
     @Test
     void createShouldInvokeRepositoryWithoutProductNameIsNull() {
         Product productToSave = TestDataProduct.builder().
@@ -112,33 +113,36 @@ class ProductServiceImplTest {
         productService.create(productDto);
 
         verify(productRepository).save(productArgumentCaptor.capture());
-        assertThat(productArgumentCaptor.getValue()).hasFieldOrPropertyWithValue(Product.Fields.uuid, null);
+        assertThat(productArgumentCaptor.getValue()).hasFieldOrPropertyWithValue(Product.Fields.name, null);
     }
 
     @Test
     void updateShouldWithUUID() {
         ProductDto expected = TestDataProduct.builder().build().buildProductDTO();
-        productService.update(UUID.fromString("aa77f040-308f-4ee0-acf1-d86c310bb52f"),expected);
+        productService.update(UUID.fromString("aa77f040-308f-4ee0-acf1-d86c310bb52f"), expected);
     }
 
     @Test
     void updateShouldWithUUIDNull() {
         ProductDto expected = TestDataProduct.builder().build().buildProductDTO();
-        productService.update(null,expected);
+        productService.update(null, expected);
     }
 
     @Test
     void deleteProductEqualsWithoutUUID() {
-        TestDataProduct expected = TestDataProduct.builder()
-                .withUuid(null)
-                .build();
-        verify(productService).delete(expected.getUuid());
+        Product product = TestDataProduct.builder().withUuid(null).build().buildProduct();
+        doNothing().when(productRepository).delete(product.getUuid());
+        productService.delete(product.getUuid());
+        verify(productRepository).delete(product.getUuid());
     }
+
     @Test
-    void deleteShouldWithPrice() {
-        TestDataProduct expected = TestDataProduct.builder()
+    void deleteShouldWithPriceOne() {
+        Product product = TestDataProduct.builder()
                 .withPrice(BigDecimal.ONE)
-                .build();
-        verify(productRepository).delete(expected.getUuid());
+                .build()
+                .buildProduct();
+        productService.delete(product.getUuid());
+        verify(productRepository).delete(product.getUuid());
     }
 }

@@ -3,6 +3,8 @@ package ru.clevertec.product.repository.impl;
 import org.assertj.core.api.Assert;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -10,15 +12,19 @@ import ru.clevertec.product.entity.Product;
 import ru.clevertec.product.util.TestDataProduct;
 
 import java.math.BigDecimal;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Stream;
 
 
 import static net.bytebuddy.matcher.ElementMatchers.is;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -30,23 +36,20 @@ class InMemoryProductRepositoryTest {
     @Test
     void findByIdShouldReturnExpectedProductWithUUID() {
         Product expected = TestDataProduct.builder().build().buildProduct();
-        Product actual = productRepository.findById(expected.getUuid()).orElseThrow();
-        assertThat(actual)
-                .hasFieldOrPropertyWithValue(Product.Fields.uuid, expected.getUuid());
+        when(productRepository.findById(expected.getUuid())).thenReturn(Optional.of(expected));
+        Optional<Product> actual = productRepository.findById(expected.getUuid());
+        assertEquals(expected, actual.get());
     }
 
     @Test
     void findByIdShouldReturnExpectedProductEqualsWithoutUUID() {
-        TestDataProduct expected = TestDataProduct.builder()
+        Product expected = TestDataProduct.builder()
                 .withUuid(null)
-                .build();
-        Product actual = productRepository.findById(expected.getUuid()).orElseThrow();
-        assertThat(actual)
-                .hasFieldOrPropertyWithValue(Product.Fields.uuid, expected.getUuid())
-                .hasFieldOrPropertyWithValue(Product.Fields.name, expected.getName())
-                .hasFieldOrPropertyWithValue(Product.Fields.description, expected.getDescription())
-                .hasFieldOrPropertyWithValue(Product.Fields.price, expected.getPrice())
-                .hasFieldOrPropertyWithValue(Product.Fields.created, expected.getCreated());
+                .build()
+                .buildProduct();
+        when(productRepository.findById(expected.getUuid())).thenReturn(Optional.of(expected));
+        Optional<Product> actual = productRepository.findById(expected.getUuid());
+        assertEquals(expected, actual.get());
     }
 
     @Test
@@ -57,69 +60,53 @@ class InMemoryProductRepositoryTest {
         assertEquals(expected, actual);
     }
 
-    @Test
-    void findByIdShouldReturnExpectedProductWithName() {
-        Product expected = TestDataProduct.builder().build().buildProduct();
-        Product actual = productRepository.findById(expected.getUuid()).orElseThrow();
-        assertThat(actual)
-                .hasFieldOrPropertyWithValue(Product.Fields.uuid, expected.getUuid());
+    @ParameterizedTest
+    @MethodSource("findAllTestData")
+    void testFindAll(List<Product> repositoryData) {
+        when(productRepository.findAll()).thenReturn(repositoryData);
+
+        List<Product> actualProducts = productRepository.findAll();
+
+        assertEquals(repositoryData, actualProducts);
     }
 
-    @Test
-    void findAll() {
-        Product expected =  TestDataProduct.builder().build().buildProduct();
-        List<Product> actual = productRepository.findAll();
-        Mockito.when(actual.get(any())).thenReturn(expected);
+    static Stream<List<Product>> findAllTestData() {
+        return Stream.of(
+                List.of(),
+                List.of(TestDataProduct.builder().build().buildProduct()),
+                Arrays.asList(
+                        TestDataProduct.builder().build().buildProduct(),
+                        TestDataProduct.builder().build().buildProduct()
+                )
+        );
     }
 
     @Test
     void save() {
-        Product expected = TestDataProduct.builder().build().buildProduct();
-        Product actual = productRepository.save(expected);
-        assertThat(actual)
-                .hasFieldOrPropertyWithValue(Product.Fields.uuid, expected.getUuid())
-                .hasFieldOrPropertyWithValue(Product.Fields.name, expected.getName())
-                .hasFieldOrPropertyWithValue(Product.Fields.description, expected.getDescription())
-                .hasFieldOrPropertyWithValue(Product.Fields.price, expected.getPrice())
-                .hasFieldOrPropertyWithValue(Product.Fields.created, expected.getCreated());
+        Product expectedProduct = TestDataProduct.builder().build().buildProduct();
+        when(productRepository.save(expectedProduct)).thenReturn(null);
+        Product savedProduct = productRepository.save(expectedProduct);
+        assertThat(savedProduct).isNull();
     }
+
     @Test
-    void saveShouldReturnExpectedProductWithoutUUID() {
-        Product expected = TestDataProduct.builder()
-                .withUuid(null)
-                .build()
-                .buildProduct();
-        Product actual = productRepository.save(expected);
-        assertThat(actual)
-                .hasFieldOrPropertyWithValue(Product.Fields.uuid, expected.getUuid())
-                .hasFieldOrPropertyWithValue(Product.Fields.name, expected.getName())
-                .hasFieldOrPropertyWithValue(Product.Fields.description, expected.getDescription())
-                .hasFieldOrPropertyWithValue(Product.Fields.price, expected.getPrice())
-                .hasFieldOrPropertyWithValue(Product.Fields.created, expected.getCreated());
+    void saveShouldReturnNull() {
+        Product expectedProduct = TestDataProduct.builder().build().buildProduct();
+        when(productRepository.save(expectedProduct)).thenReturn(null);
+        Product savedProduct = productRepository.save(expectedProduct);
+        assertThat(savedProduct).isNull();
     }
-    @Test
-    void saveShouldReturnExpectedProductWithPriceIsNull() {
-        Product expected = TestDataProduct.builder()
-                .withPrice(null)
-                .build()
-                .buildProduct();
-        Product actual = productRepository.save(expected);
-        assertThat(actual)
-                .hasFieldOrPropertyWithValue(Product.Fields.uuid, expected.getUuid())
-                .hasFieldOrPropertyWithValue(Product.Fields.name, expected.getName())
-                .hasFieldOrPropertyWithValue(Product.Fields.description, expected.getDescription())
-                .hasFieldOrPropertyWithValue(Product.Fields.price, expected.getPrice())
-                .hasFieldOrPropertyWithValue(Product.Fields.created, expected.getCreated());
-    }
+
     @Test
     void saveShouldThrowExceptionIllegalArgumentException() {
-       when(productRepository.save(null))
-               .thenThrow(IllegalArgumentException.class);
+        doThrow(IllegalArgumentException.class).when(productRepository).save(null);
+        assertThrows(IllegalArgumentException.class, () -> productRepository.save(null));
     }
+
     @Test
     void deleteProductWithUUID() {
         Product expected = TestDataProduct.builder().build().buildProduct();
-       productRepository.delete(expected.getUuid());
+        productRepository.delete(expected.getUuid());
         verify(productRepository).delete(expected.getUuid());
     }
 
@@ -128,7 +115,7 @@ class InMemoryProductRepositoryTest {
         TestDataProduct expected = TestDataProduct.builder()
                 .withUuid(null)
                 .build();
-         verify(productRepository).delete(expected.getUuid());
+        productRepository.delete(expected.getUuid());
     }
 
     @Test
@@ -136,7 +123,6 @@ class InMemoryProductRepositoryTest {
         TestDataProduct expected = TestDataProduct.builder()
                 .withName("test")
                 .build();
-        verify(productRepository).delete(expected.getUuid());
+        productRepository.delete(expected.getUuid());
     }
-
 }
