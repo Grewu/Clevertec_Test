@@ -16,6 +16,7 @@ import ru.clevertec.product.util.TestDataProduct;
 import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -47,7 +48,7 @@ class ProductServiceImplTest {
                 .build()
                 .buildProduct();
         assertThrows(ProductNotFoundException.class, () -> {
-            InfoProductDto actual = productService.get(expected.getUuid());
+            productService.get(expected.getUuid());
         });
     }
 
@@ -144,5 +145,14 @@ class ProductServiceImplTest {
                 .buildProduct();
         productService.delete(product.getUuid());
         verify(productRepository).delete(product.getUuid());
+    }
+
+    @Test
+    void getInfoProductDto() {
+        InfoProductDto expected = TestDataProduct.builder().build().buidInfoProductDto();
+        doReturn(Optional.of(TestDataProduct.builder().build().buildProduct())).
+                when(productRepository).findById(TestDataProduct.builder().build().getUuid());
+        InfoProductDto actual = productService.get(UUID.fromString("b6e1d925-ebca-458e-b032-c3dd2b8f1671"));
+        Assertions.assertEquals(expected,actual);
     }
 }

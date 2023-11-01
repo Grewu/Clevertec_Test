@@ -42,7 +42,7 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public UUID create(ProductDto productDto) {
         Product product = mapper.toProduct(productDto);
-       Product saved = productRepository.save(product);
+        Product saved = productRepository.save(product);
         return saved.getUuid();
     }
 
