@@ -28,12 +28,16 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class ProductServiceImplTest {
+
     @Mock
     private ProductMapper productMapper;
+
     @Mock
     private ProductRepository productRepository;
+
     @InjectMocks
     private ProductServiceImpl productService;
+
     @Captor
     private ArgumentCaptor<Product> productArgumentCaptor;
 
@@ -148,7 +152,7 @@ class ProductServiceImplTest {
         InfoProductDto expected = TestDataProduct.builder().build().buidInfoProductDto();
         doReturn(Optional.of(TestDataProduct.builder().build().buildProduct())).
                 when(productRepository).findById(TestDataProduct.builder().build().getUuid());
-        InfoProductDto actual = productService.get(UUID.fromString("b6e1d925-ebca-458e-b032-c3dd2b8f1671"));
+        InfoProductDto actual = productService.get(TestDataProduct.builder().build().getUuid());
         Assertions.assertEquals(expected, actual);
     }
 }
