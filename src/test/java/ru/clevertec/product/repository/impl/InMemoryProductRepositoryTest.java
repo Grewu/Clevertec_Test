@@ -1,17 +1,16 @@
 package ru.clevertec.product.repository.impl;
 
-import org.assertj.core.api.Assert;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import ru.clevertec.product.entity.Product;
 import ru.clevertec.product.util.TestDataProduct;
 
-import java.math.BigDecimal;
+
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -19,7 +18,6 @@ import java.util.UUID;
 import java.util.stream.Stream;
 
 
-import static net.bytebuddy.matcher.ElementMatchers.is;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;

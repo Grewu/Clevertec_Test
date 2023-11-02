@@ -20,11 +20,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
@@ -153,6 +149,6 @@ class ProductServiceImplTest {
         doReturn(Optional.of(TestDataProduct.builder().build().buildProduct())).
                 when(productRepository).findById(TestDataProduct.builder().build().getUuid());
         InfoProductDto actual = productService.get(UUID.fromString("b6e1d925-ebca-458e-b032-c3dd2b8f1671"));
-        Assertions.assertEquals(expected,actual);
+        Assertions.assertEquals(expected, actual);
     }
 }
