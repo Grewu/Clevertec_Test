@@ -25,27 +25,27 @@ class InMemoryProductRepositoryTest {
     private InMemoryProductRepository productRepository;
 
     @Test
-    void findById_nonExistingProduct_returnsOptionalEmpty() {
+    void findByIdNonExistingProductReturnsOptionalEmpty() {
         UUID nonExistingUuid = UUID.fromString("b6e1d925-ebca-458e-b032-c3dd2b8f1671");
         Optional<Product> result = productRepository.findById(nonExistingUuid);
         assertFalse(result.isPresent());
     }
 
     @Test
-    void findAll_emptyRepository_returnsEmptyList() {
+    void findAllEmptyRepositoryReturnsEmptyList() {
         List<Product> result = productRepository.findAll();
         assertEquals(0, result.size());
     }
 
     @Test
-    void save_validProduct_returnsSavedProduct() {
+    void saveValidProductReturnsSavedProduct() {
         Product product = TestDataProduct.builder().build().buildProduct();
         Product savedProduct = productRepository.save(product);
         assertEquals(product, savedProduct);
     }
 
     @Test
-    void delete_existingProduct_deletesProduct() {
+    void deleteExistingProductDeletesProduct() {
         UUID uuid = UUID.fromString("b6e1d925-ebca-458e-b032-c3dd2b8f1671");
         Product product = TestDataProduct.builder().build().buildProduct();
         productRepository.save(product);
@@ -56,7 +56,7 @@ class InMemoryProductRepositoryTest {
 
     @ParameterizedTest
     @MethodSource("provideFindByIdScenarios")
-    void findById_multipleScenarios(UUID inputUuid, Product expectedProduct) {
+    void findByIdMultipleScenarios(UUID inputUuid, Product expectedProduct) {
         if (expectedProduct != null) {
             productRepository.save(expectedProduct);
         }
