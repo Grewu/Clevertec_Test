@@ -19,12 +19,8 @@ class ProductMapperTest {
     @ParameterizedTest
     @CsvSource(value = {"Product,NewProduct,1.57"})
     void toProductShouldReturnProduct(String name, String description, BigDecimal bigDecimal) {
-        // given (С переменными)
-
-        // given (Опционально со стабами)
         ProductMapper mapper = new ProductMapperImpl();
 
-        // when
         ProductDto productDto = TestDataProduct.builder()
                 .withName(name)
                 .withDescription(description)
@@ -32,7 +28,6 @@ class ProductMapperTest {
                 .build()
                 .buildProductDTO();
 
-        // then требования
         Product expected = TestDataProduct.builder()
                 .withUuid(null)
                 .withName(name)
@@ -44,7 +39,6 @@ class ProductMapperTest {
 
         Product actual = mapper.toProduct(productDto);
 
-        // then требования
         assertEquals(expected, actual);
     }
 

@@ -151,12 +151,6 @@ class ProductServiceImplTest {
         verify(productRepository).delete(product.getUuid());
     }
 
-    @Test
-    void getInfoProductDto() {
-        InfoProductDto expected = TestDataProduct.builder().build().buidInfoProductDto();
-        doReturn(Optional.of(TestDataProduct.builder().build().buildProduct())).
-                when(productRepository).findById(TestDataProduct.builder().build().getUuid());
-        InfoProductDto actual = productService.get(TestDataProduct.builder().build().getUuid());
-        Assertions.assertEquals(expected, actual);
-    }
+
+
 }

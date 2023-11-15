@@ -78,4 +78,5 @@ class InMemoryProductRepositoryTest {
                 Arguments.of(nonExistingUuid, null)
         );
     }
+
 }
