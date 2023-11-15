@@ -6,7 +6,7 @@ import ru.clevertec.product.repository.ProductRepository;
 import java.util.*;
 
 public class InMemoryProductRepository implements ProductRepository {
-    private Map<UUID, Product> productMap = new HashMap<>();
+    private final Map<UUID, Product> productMap = new HashMap<>();
 
     @Override
     public Optional<Product> findById(UUID uuid) {
