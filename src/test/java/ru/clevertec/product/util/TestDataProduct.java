@@ -18,6 +18,7 @@ import java.util.UUID;
 public class TestDataProduct {
     @Builder.Default
     private UUID uuid = UUID.fromString("b6e1d925-ebca-458e-b032-c3dd2b8f1671");
+
     @Builder.Default
     private String name = "Product";
 
@@ -26,14 +27,18 @@ public class TestDataProduct {
 
     @Builder.Default
     private BigDecimal price = BigDecimal.valueOf(1.01);
+
     @Builder.Default
     private LocalDateTime created = LocalDateTime.of(2023, Month.DECEMBER, 26, 17, 0, 0);
+
     public Product buildProduct(){
         return new Product(uuid,name,description,price,created);
     }
+
     public ProductDto buildProductDTO(){
         return new ProductDto(name,description,price);
     }
+
     public InfoProductDto buidInfoProductDto(){
         return  new InfoProductDto(uuid,name,description,price);
     }

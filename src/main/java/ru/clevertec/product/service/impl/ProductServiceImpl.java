@@ -22,13 +22,9 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public InfoProductDto get(UUID uuid) {
-        Optional<Product> productOptional = productRepository.findById(uuid);
-        if (productOptional.isPresent()) {
-            Product product = productOptional.get();
-            return mapper.toInfoProductDto(product);
-        } else {
-            throw new ProductNotFoundException(uuid);
-        }
+        return productRepository.findById(uuid)
+                .map(mapper::toInfoProductDto)
+                .orElseThrow(() -> new ProductNotFoundException(uuid));
     }
 
     @Override
@@ -50,10 +46,7 @@ public class ProductServiceImpl implements ProductService {
     public void update(UUID uuid, ProductDto productDto) {
         Optional<Product> productOptional = productRepository.findById(uuid);
         productOptional.ifPresent(existingProduct -> {
-            existingProduct.setName(productDto.name());
-            existingProduct.setDescription(productDto.description());
-            existingProduct.setPrice(productDto.price());
-
+            mapper.merge(existingProduct, productDto);
             productRepository.save(existingProduct);
         });
     }

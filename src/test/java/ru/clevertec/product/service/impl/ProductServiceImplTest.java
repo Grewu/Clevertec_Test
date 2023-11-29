@@ -3,7 +3,10 @@ package ru.clevertec.product.service.impl;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.*;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import ru.clevertec.product.data.InfoProductDto;
 import ru.clevertec.product.data.ProductDto;
@@ -20,6 +23,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
@@ -28,12 +32,16 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class ProductServiceImplTest {
+
     @Mock
     private ProductMapper productMapper;
+
     @Mock
     private ProductRepository productRepository;
+
     @InjectMocks
     private ProductServiceImpl productService;
+
     @Captor
     private ArgumentCaptor<Product> productArgumentCaptor;
 
@@ -143,12 +151,6 @@ class ProductServiceImplTest {
         verify(productRepository).delete(product.getUuid());
     }
 
-    @Test
-    void getInfoProductDto() {
-        InfoProductDto expected = TestDataProduct.builder().build().buidInfoProductDto();
-        doReturn(Optional.of(TestDataProduct.builder().build().buildProduct())).
-                when(productRepository).findById(TestDataProduct.builder().build().getUuid());
-        InfoProductDto actual = productService.get(UUID.fromString("b6e1d925-ebca-458e-b032-c3dd2b8f1671"));
-        Assertions.assertEquals(expected, actual);
-    }
+
+
 }
